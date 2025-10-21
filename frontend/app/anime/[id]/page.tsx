@@ -1,61 +1,63 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { ArrowLeft, Play, AlertCircle, Loader } from "lucide-react"
-import { useParams } from "next/navigation"
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft, Play, AlertCircle, Loader } from "lucide-react";
+import { useParams } from "next/navigation";
 
 interface AnimeDetails {
-  id: number
-  titleRomaji: string
-  titleEnglish: string
-  coverImage: string
-  bannerImage: string
-  episodes: number
-  status: string
-  description: string
-  genres: string[]
-  year: number
-  averageScore: number
-  popularity: number
+  id: number;
+  titleRomaji: string;
+  titleEnglish: string;
+  coverImage: string;
+  bannerImage: string;
+  episodes: number;
+  status: string;
+  description: string;
+  genres: string[];
+  year: number;
+  averageScore: number;
+  popularity: number;
 }
 
 interface Source {
-  quality: string
-  url: string
-  source: string
-  referrer: string
+  quality: string;
+  url: string;
+  source: string;
+  referrer: string;
 }
 
 export default function AnimeDetailsPage() {
-  const params = useParams()
-  const animeId = params.id as string
+  const params = useParams();
+  const animeId = params.id as string;
 
-  const [anime, setAnime] = useState<AnimeDetails | null>(null)
-  const [sources, setSources] = useState<Source[]>([])
-  const [selectedEpisode, setSelectedEpisode] = useState<number>(1)
-  const [loading, setLoading] = useState(true)
-  const [loadingSources, setLoadingSources] = useState(false)
-  const [error, setError] = useState("")
-  const [dub, setDub] = useState(false)
+  const [anime, setAnime] = useState<AnimeDetails | null>(null);
+  const [sources, setSources] = useState<Source[]>([]);
+  const [selectedEpisode, setSelectedEpisode] = useState<number>(1);
+  const [loading, setLoading] = useState(true);
+  const [loadingSources, setLoadingSources] = useState(false);
+  const [error, setError] = useState("");
+  const [dub, setDub] = useState(false);
 
   // Fetch anime details
   useEffect(() => {
     const fetchAnimeDetails = async () => {
       try {
-        setLoading(true)
-        const response = await fetch(`http://localhost:4000/anime/${animeId}`)
+        setLoading(true);
+        const response = await fetch(
+          `http://34.47.230.194:4000/anime/${animeId}`
+        );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch anime details")
+          throw new Error("Failed to fetch anime details");
         }
 
-        const data = await response.json()
-        let animeDetails: AnimeDetails
+        const data = await response.json();
+        let animeDetails: AnimeDetails;
 
         animeDetails = {
-          id: data.id,  
+          id: data.id,
           titleRomaji: data.title.romaji,
           titleEnglish: data.title.english,
           coverImage: data.coverImage.extraLarge,
@@ -67,54 +69,54 @@ export default function AnimeDetailsPage() {
           year: data.seasonYear,
           averageScore: data.averageScore,
           popularity: data.popularity,
-        }
+        };
 
-        setAnime(animeDetails)
-        setSelectedEpisode(1)
+        setAnime(animeDetails);
+        setSelectedEpisode(1);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred")
+        setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     if (animeId) {
-      fetchAnimeDetails()
+      fetchAnimeDetails();
     }
-  }, [animeId])
+  }, [animeId]);
 
   // Fetch sources
   useEffect(() => {
     const fetchSources = async () => {
-      if (!anime) return
-      
+      if (!anime) return;
+
       try {
-        setLoadingSources(true)
-        const response = await fetch(`http://localhost:4000/sources`)
-        
+        setLoadingSources(true);
+        const response = await fetch(`http://34.47.230.194:4000/sources`);
+
         if (response.ok) {
-          const data = await response.json()
-          setSources(data.sources || [])
+          const data = await response.json();
+          setSources(data.sources || []);
         }
       } catch (err) {
-        console.error("Error fetching sources:", err)
-        setSources([])
+        console.error("Error fetching sources:", err);
+        setSources([]);
       } finally {
-        setLoadingSources(false)
+        setLoadingSources(false);
       }
-    }
+    };
 
     if (anime) {
-      fetchSources()
+      fetchSources();
     }
-  }, [anime, selectedEpisode, dub])
+  }, [anime, selectedEpisode, dub]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader className="w-8 h-8 animate-spin text-primary" />
       </div>
-    )
+    );
   }
 
   if (error || !anime) {
@@ -126,7 +128,7 @@ export default function AnimeDetailsPage() {
           Back to Search
         </Link>
       </div>
-    )
+    );
   }
 
   return (
@@ -184,15 +186,15 @@ export default function AnimeDetailsPage() {
 
               {anime.averageScore && (
                 <div className="flex items-center gap-2">
-                  <span className="text-primary font-bold">{anime.averageScore}%</span>
+                  <span className="text-primary font-bold">
+                    {anime.averageScore}%
+                  </span>
                   <span className="text-muted-foreground">Score</span>
                 </div>
               )}
 
               {anime.year && (
-                <span className="text-muted-foreground">
-                  {anime.year}
-                </span>
+                <span className="text-muted-foreground">{anime.year}</span>
               )}
             </div>
 
@@ -223,7 +225,9 @@ export default function AnimeDetailsPage() {
 
         {/* Player Section */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Watch Episode</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">
+            Watch Episode
+          </h2>
 
           {/* Episode Selection */}
           <div className="mb-6 space-y-4">
@@ -241,7 +245,9 @@ export default function AnimeDetailsPage() {
 
             {/* Episode List */}
             <div className="space-y-2">
-              <label className="text-muted-foreground text-sm">Episode {selectedEpisode} of {anime.episodes}</label>
+              <label className="text-muted-foreground text-sm">
+                Episode {selectedEpisode} of {anime.episodes}
+              </label>
               <input
                 type="range"
                 min="1"
@@ -255,13 +261,17 @@ export default function AnimeDetailsPage() {
 
           {/* Sources Preview */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Available Sources</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">
+              Available Sources
+            </h3>
             {loadingSources ? (
               <div className="flex justify-center py-4">
                 <Loader className="w-6 h-6 animate-spin text-primary" />
               </div>
             ) : sources.length === 0 ? (
-              <p className="text-muted-foreground">Click play to load sources</p>
+              <p className="text-muted-foreground">
+                Click play to load sources
+              </p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {sources.slice(0, 3).map((source, index) => (
@@ -284,7 +294,9 @@ export default function AnimeDetailsPage() {
           {/* Play Button */}
           <div className="flex justify-center">
             <Link
-              href={`/player?animeId=${animeId}&anime=${encodeURIComponent(anime.titleEnglish || anime.titleRomaji)}&episode=${selectedEpisode}&dub=${dub}`}
+              href={`/player?animeId=${animeId}&anime=${encodeURIComponent(
+                anime.titleEnglish || anime.titleRomaji
+              )}&episode=${selectedEpisode}&dub=${dub}`}
             >
               <button className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold transition-colors flex items-center justify-center gap-3 text-lg">
                 <Play className="w-6 h-6" />
@@ -295,5 +307,5 @@ export default function AnimeDetailsPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

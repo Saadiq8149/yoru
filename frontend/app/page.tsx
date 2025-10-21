@@ -91,7 +91,7 @@ export default function Home() {
   // Fetch AniList user data
   const fetchAniListUser = async (token: string) => {
     try {
-      const response = await fetch("http://localhost:4000/anilist/user", {
+      const response = await fetch("http://34.47.230.194:4000/anilist/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ access_token: token }),
@@ -115,11 +115,14 @@ export default function Home() {
     if (!accessToken) return;
 
     try {
-      const response = await fetch("http://localhost:4000/continue-watching", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ access_token: accessToken }),
-      });
+      const response = await fetch(
+        "http://34.47.230.194:4000/continue-watching",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ access_token: accessToken }),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -134,7 +137,9 @@ export default function Home() {
   // AniList login
   const loginToAniList = async () => {
     try {
-      const response = await fetch("http://localhost:4000/anilist/oauth-url");
+      const response = await fetch(
+        "http://34.47.230.194:4000/anilist/oauth-url"
+      );
       const data = await response.json();
       window.location.href = data.oauth_url;
     } catch (error) {
@@ -156,9 +161,9 @@ export default function Home() {
     const fetchData = async () => {
       try {
         const [trendingRes, popularRes, latestRes] = await Promise.all([
-          fetch("http://localhost:4000/trending?per_page=12"),
-          fetch("http://localhost:4000/popular?per_page=12"),
-          fetch("http://localhost:4000/latest?per_page=12"),
+          fetch("http://34.47.230.194:4000/trending?per_page=12"),
+          fetch("http://34.47.230.194:4000/popular?per_page=12"),
+          fetch("http://34.47.230.194:4000/latest?per_page=12"),
         ]);
 
         const [trendingData, popularData, latestData] = await Promise.all([

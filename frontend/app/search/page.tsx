@@ -1,57 +1,57 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { Search as SearchIcon, Loader } from "lucide-react"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Search as SearchIcon, Loader } from "lucide-react";
 
 interface AnimeResult {
-  id: number
-  titleRomaji: string
-  titleEnglish: string
-  bannerImage: string
-  coverImage: string
-  status: string
-  episodes: number
-  description: string
-  year: number
+  id: number;
+  titleRomaji: string;
+  titleEnglish: string;
+  bannerImage: string;
+  coverImage: string;
+  status: string;
+  episodes: number;
+  description: string;
+  year: number;
 }
 
 export default function SearchPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [results, setResults] = useState<AnimeResult[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [searchQuery, setSearchQuery] = useState("");
+  const [results, setResults] = useState<AnimeResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   // Debounce search function
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (searchQuery.trim()) {
-        handleSearch(searchQuery)
+        handleSearch(searchQuery);
       } else {
-        setResults([])
+        setResults([]);
       }
-    }, 500)
+    }, 500);
 
-    return () => clearTimeout(timeoutId)
-  }, [searchQuery])
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
 
   const handleSearch = async (query: string) => {
-    setLoading(true)
-    setError("")
+    setLoading(true);
+    setError("");
     try {
       const response = await fetch(
-        `http://localhost:4000/search/${encodeURIComponent(query)}`
-      )
+        `http://34.47.230.194:4000/search/${encodeURIComponent(query)}`
+      );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch search results")
+        throw new Error("Failed to fetch search results");
       }
 
-      const data = await response.json()
+      const data = await response.json();
 
-      let resultsArray: AnimeResult[] = []
-      console.log("Search results:", data)
+      let resultsArray: AnimeResult[] = [];
+      console.log("Search results:", data);
 
       for (const item of data) {
         resultsArray.push({
@@ -64,24 +64,26 @@ export default function SearchPage() {
           episodes: item.episodes,
           description: item.description,
           year: item.seasonYear,
-        })
+        });
       }
 
-      setResults(resultsArray)
+      setResults(resultsArray);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      setResults([])
+      setError(err instanceof Error ? err.message : "An error occurred");
+      setResults([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header with Search Bar */}
       <div className="sticky top-0 z-10 bg-linear-to-b from-card to-transparent p-4 md:p-8 border-b border-border">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6 text-foreground">Search Anime</h1>
+          <h1 className="text-3xl font-bold mb-6 text-foreground">
+            Search Anime
+          </h1>
 
           <div className="relative">
             <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
@@ -100,9 +102,7 @@ export default function SearchPage() {
       <div className="p-4 md:p-8">
         <div className="max-w-6xl mx-auto">
           {error && (
-            <div className="text-red-500 text-center py-8">
-              {error}
-            </div>
+            <div className="text-red-500 text-center py-8">{error}</div>
           )}
 
           {loading && (
@@ -120,15 +120,13 @@ export default function SearchPage() {
           {!loading && results.length > 0 && (
             <div>
               <p className="text-muted-foreground mb-6">
-                Found {results.length} result{results.length !== 1 ? "s" : ""} for "{searchQuery}"
+                Found {results.length} result{results.length !== 1 ? "s" : ""}{" "}
+                for "{searchQuery}"
               </p>
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 {results.map((anime) => (
-                  <Link
-                    key={anime.id}
-                    href={`/anime/${anime.id}`}
-                  >
+                  <Link key={anime.id} href={`/anime/${anime.id}`}>
                     <div className="group cursor-pointer h-full">
                       {/* Thumbnail */}
                       <div className="relative h-100 rounded-lg overflow-hidden bg-card border border-border mb-4 transition-all duration-300 group-hover:border-primary">
@@ -166,7 +164,9 @@ export default function SearchPage() {
                           {anime.titleEnglish || anime.titleRomaji}
                         </h3>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {anime.episodes ? `${anime.episodes} Episodes` : "Ongoing"}
+                          {anime.episodes
+                            ? `${anime.episodes} Episodes`
+                            : "Ongoing"}
                         </p>
                       </div>
                     </div>
@@ -184,5 +184,5 @@ export default function SearchPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

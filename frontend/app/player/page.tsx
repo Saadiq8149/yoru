@@ -62,7 +62,7 @@ export default function PlayerPage() {
     try {
       setSyncProgress(true);
       const response = await fetch(
-        "http://localhost:4000/anilist/update-progress",
+        "http://34.47.230.194:4000/anilist/update-progress",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -102,7 +102,7 @@ export default function PlayerPage() {
     if (!animeId) return;
 
     setLoading(true);
-    fetch(`http://localhost:4000/anime/${animeId}`)
+    fetch(`http://34.47.230.194:4000/anime/${animeId}`)
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
@@ -128,7 +128,7 @@ export default function PlayerPage() {
       setLoadingSources(true);
       try {
         const res = await fetch(
-          `http://localhost:4000/sources?anilist_id=${animeId}&episode=${currentEpisode}&dub=${dubParam}&title=${encodeURIComponent(
+          `http://34.47.230.194:4000/sources?anilist_id=${animeId}&episode=${currentEpisode}&dub=${dubParam}&title=${encodeURIComponent(
             animeTitle
           )}`
         );
@@ -198,7 +198,7 @@ export default function PlayerPage() {
 
     // Update source if selectedSource exists
     if (selectedSource && playerRef.current) {
-      const proxyUrl = `http://localhost:4000/proxy?url=${encodeURIComponent(
+      const proxyUrl = `http://34.47.230.194:4000/proxy?url=${encodeURIComponent(
         selectedSource.url
       )}&ref=${encodeURIComponent(selectedSource.referrer)}`;
       console.log("🎥 Updating player source to:", proxyUrl);
