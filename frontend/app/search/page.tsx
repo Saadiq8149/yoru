@@ -40,9 +40,7 @@ export default function SearchPage() {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch(
-        `http://34.47.230.194:4000/search/${encodeURIComponent(query)}`
-      );
+      const response = await fetch(`/api/search/${encodeURIComponent(query)}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch search results");

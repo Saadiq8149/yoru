@@ -55,25 +55,30 @@ export default function PlayerPage() {
   // Sync progress with AniList
   const updateAniListProgress = async (
     episode: number,
-    totalEpisodes: number
+    totalEpisodes: number,
+    status?: string
   ) => {
     if (!accessToken || !animeId) return;
 
     try {
       setSyncProgress(true);
-      const response = await fetch(
-        "http://34.47.230.194:4000/anilist/update-progress",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            media_id: parseInt(animeId),
-            episode: episode,
-            total_episodes: totalEpisodes,
-            access_token: accessToken,
-          }),
-        }
-      );
+      const requestBody: any = {
+        media_id: parseInt(animeId),
+        episode: episode,
+        total_episodes: totalEpisodes,
+        access_token: accessToken,
+      };
+
+      // Include status if provided
+      if (status) {
+        requestBody.status = status;
+      }
+
+      const response = await fetch("/api/anilist/update-progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -81,7 +86,7 @@ export default function PlayerPage() {
 
         // Show a brief success message
         const syncIndicator = document.createElement("div");
-        syncIndicator.textContent = `✅ Synced: Episode ${episode}`;
+        syncIndicator.textContent = `✅ ${data.message}`;
         syncIndicator.className =
           "fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg z-50";
         document.body.appendChild(syncIndicator);
@@ -102,7 +107,7 @@ export default function PlayerPage() {
     if (!animeId) return;
 
     setLoading(true);
-    fetch(`http://34.47.230.194:4000/anime/${animeId}`)
+    fetch(`/api/anime/${animeId}`)
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
@@ -120,6 +125,13 @@ export default function PlayerPage() {
     console;
   }, [animeId]);
 
+  // Update status to CURRENT (watching) when page loads
+  useEffect(() => {
+    if (anime && accessToken && animeId) {
+      updateAniListProgress(currentEpisode, anime.episodes, "CURRENT");
+    }
+  }, [anime, accessToken]);
+
   // Fetch sources for current episode
   useEffect(() => {
     if (!animeId || !animeTitle) return;
@@ -128,7 +140,7 @@ export default function PlayerPage() {
       setLoadingSources(true);
       try {
         const res = await fetch(
-          `http://34.47.230.194:4000/sources?anilist_id=${animeId}&episode=${currentEpisode}&dub=${dubParam}&title=${encodeURIComponent(
+          `/api/sources?anilist_id=${animeId}&episode=${currentEpisode}&dub=${dubParam}&title=${encodeURIComponent(
             animeTitle
           )}`
         );
@@ -190,7 +202,7 @@ export default function PlayerPage() {
         if (currentTime && duration && currentTime / duration >= 0.8) {
           if (anime && accessToken && !syncProgress) {
             setSyncProgress(true);
-            updateAniListProgress(currentEpisode, anime.episodes);
+            updateAniListProgress(currentEpisode, anime.episodes, "COMPLETED");
           }
         }
       });
@@ -198,7 +210,7 @@ export default function PlayerPage() {
 
     // Update source if selectedSource exists
     if (selectedSource && playerRef.current) {
-      const proxyUrl = `http://34.47.230.194:4000/proxy?url=${encodeURIComponent(
+      const proxyUrl = `/api/proxy?url=${encodeURIComponent(
         selectedSource.url
       )}&ref=${encodeURIComponent(selectedSource.referrer)}`;
       console.log("🎥 Updating player source to:", proxyUrl);

@@ -45,9 +45,7 @@ export default function AnimeDetailsPage() {
     const fetchAnimeDetails = async () => {
       try {
         setLoading(true);
-        const response = await fetch(
-          `http://34.47.230.194:4000/anime/${animeId}`
-        );
+        const response = await fetch(`/api/anime/${animeId}`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch anime details");
@@ -92,7 +90,7 @@ export default function AnimeDetailsPage() {
 
       try {
         setLoadingSources(true);
-        const response = await fetch(`http://34.47.230.194:4000/sources`);
+        const response = await fetch(`/api/sources`);
 
         if (response.ok) {
           const data = await response.json();

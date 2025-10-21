@@ -32,7 +32,7 @@ export default function AuthCallbackPage() {
       try {
         // Exchange code for token
         const response = await fetch(
-          `http://34.47.230.194:4000/anilist/exchange-code?code=${code}`,
+          `/api/anilist/exchange-code?code=${code}`,
           {
             method: "POST",
             headers: {

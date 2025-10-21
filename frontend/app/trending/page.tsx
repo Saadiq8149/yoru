@@ -42,9 +42,7 @@ export default function TrendingPage() {
       if (page === 1) setLoading(true);
       else setLoadingMore(true);
 
-      const response = await fetch(
-        `http://34.47.230.194:4000/trending?page=${page}&per_page=20`
-      );
+      const response = await fetch(`/api/trending?page=${page}&per_page=20`);
       const data: ApiResponse = await response.json();
 
       if (append) {

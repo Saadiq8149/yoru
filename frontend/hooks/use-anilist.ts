@@ -73,9 +73,7 @@ export function useAniList(): AniListAuth {
   const login = async () => {
     try {
       // Get OAuth URL from backend
-      const response = await fetch(
-        "http://34.47.230.194:4000/anilist/oauth-url"
-      );
+      const response = await fetch("/api/anilist/oauth-url");
       const data = await response.json();
       window.location.href = data.oauth_url;
     } catch (error) {
