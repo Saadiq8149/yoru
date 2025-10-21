@@ -55,29 +55,21 @@ export default function PlayerPage() {
   // Sync progress with AniList
   const updateAniListProgress = async (
     episode: number,
-    totalEpisodes: number,
-    status?: string
+    totalEpisodes: number
   ) => {
     if (!accessToken || !animeId) return;
 
     try {
       setSyncProgress(true);
-      const requestBody: any = {
-        media_id: parseInt(animeId),
-        episode: episode,
-        total_episodes: totalEpisodes,
-        access_token: accessToken,
-      };
-
-      // Include status if provided
-      if (status) {
-        requestBody.status = status;
-      }
-
       const response = await fetch("/api/anilist/update-progress", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({
+          media_id: parseInt(animeId),
+          episode: episode,
+          total_episodes: totalEpisodes,
+          access_token: accessToken,
+        }),
       });
 
       if (response.ok) {
@@ -86,7 +78,7 @@ export default function PlayerPage() {
 
         // Show a brief success message
         const syncIndicator = document.createElement("div");
-        syncIndicator.textContent = `✅ ${data.message}`;
+        syncIndicator.textContent = `✅ Synced: Episode ${episode}`;
         syncIndicator.className =
           "fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg z-50";
         document.body.appendChild(syncIndicator);
@@ -124,13 +116,6 @@ export default function PlayerPage() {
 
     console;
   }, [animeId]);
-
-  // Update status to CURRENT (watching) when page loads
-  useEffect(() => {
-    if (anime && accessToken && animeId) {
-      updateAniListProgress(currentEpisode, anime.episodes, "CURRENT");
-    }
-  }, [anime, accessToken]);
 
   // Fetch sources for current episode
   useEffect(() => {
@@ -202,7 +187,7 @@ export default function PlayerPage() {
         if (currentTime && duration && currentTime / duration >= 0.8) {
           if (anime && accessToken && !syncProgress) {
             setSyncProgress(true);
-            updateAniListProgress(currentEpisode, anime.episodes, "COMPLETED");
+            updateAniListProgress(currentEpisode, anime.episodes);
           }
         }
       });
