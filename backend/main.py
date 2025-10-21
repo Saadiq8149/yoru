@@ -659,7 +659,7 @@ async def update_progress(request: UpdateProgressRequest):
 def get_oauth_url():
     """Get AniList OAuth URL for authentication"""
     client_id = "31463"  # Replace with your actual AniList client ID
-    redirect_uri = "http://34.47.230.194::3000/auth/callback"
+    redirect_uri = "http://34.47.230.194:3000/auth/callback"
     
     # Use authorization code flow instead of implicit flow
     oauth_url = f"https://anilist.co/api/v2/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code"
