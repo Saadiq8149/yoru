@@ -63,12 +63,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             href="/search"
             onClick={onClose}
           />
-          <NavLink
+          {/* <NavLink
             icon={User}
             label="Profile"
             href="/profile"
             onClick={onClose}
-          />
+          /> */}
         </nav>
 
         {/* Footer */}

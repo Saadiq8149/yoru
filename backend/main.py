@@ -213,7 +213,7 @@ def get_latest_anime(page: int = 1, per_page: int = 20):
                     lastPage
                     hasNextPage
                 }
-                media(sort: UPDATED_AT_DESC, type: ANIME, status: RELEASING) {
+                media(sort: UPDATED_AT_DESC, type: ANIME, status: RELEASING, isAdult: false) {
                     id
                     title {
                         romaji
