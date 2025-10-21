@@ -456,6 +456,7 @@ class UpdateProgressRequest(BaseModel):
     episode: int
     total_episodes: int
     access_token: str
+    status: Optional[str] = None  # Optional status field
 
 class AniListUserRequest(BaseModel):
     access_token: str
@@ -599,7 +600,12 @@ async def update_progress(request: UpdateProgressRequest):
     """Update anime watching progress on AniList"""
     
     # Determine status based on progress
-    status = "COMPLETED" if request.episode >= request.total_episodes else "CURRENT"
+    status = request.status
+    if not status:
+        if request.episode >= request.total_episodes and request.total_episodes > 0:
+            status = "COMPLETED"
+        else:
+            status = "CURRENT"
     
     mutation = """
         mutation ($mediaId: Int, $progress: Int, $status: MediaListStatus) {
