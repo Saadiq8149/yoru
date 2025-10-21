@@ -52,64 +52,34 @@ export default function PlayerPage() {
     }
   }, []);
 
-  // Update anime status to CURRENT (watching)
-  const updateAniListStatus = async () => {
-    if (!accessToken || !animeId) return;
-
-    try {
-      const response = await fetch(
-        "http://34.47.230.194:4000/anilist/update-status",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            media_id: parseInt(animeId),
-            status: "CURRENT",
-            access_token: accessToken,
-          }),
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("✅ AniList status updated to CURRENT:", data.message);
-
-        // Show a brief success message
-        const statusIndicator = document.createElement("div");
-        statusIndicator.textContent = "✅ Status updated to Watching";
-        statusIndicator.className =
-          "fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg z-50";
-        document.body.appendChild(statusIndicator);
-
-        setTimeout(() => {
-          document.body.removeChild(statusIndicator);
-        }, 3000);
-      }
-    } catch (error) {
-      console.error("❌ AniList status update failed:", error);
-    }
-  };
-
   // Sync progress with AniList
   const updateAniListProgress = async (
     episode: number,
-    totalEpisodes: number
+    totalEpisodes: number,
+    status?: string
   ) => {
     if (!accessToken || !animeId) return;
 
     try {
       setSyncProgress(true);
+      const requestBody: any = {
+        media_id: parseInt(animeId),
+        episode: episode,
+        total_episodes: totalEpisodes,
+        access_token: accessToken,
+      };
+
+      // Include status if provided
+      if (status) {
+        requestBody.status = status;
+      }
+
       const response = await fetch(
         "http://34.47.230.194:4000/anilist/update-progress",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            media_id: parseInt(animeId),
-            episode: episode,
-            total_episodes: totalEpisodes,
-            access_token: accessToken,
-          }),
+          body: JSON.stringify(requestBody),
         }
       );
 
@@ -119,7 +89,7 @@ export default function PlayerPage() {
 
         // Show a brief success message
         const syncIndicator = document.createElement("div");
-        syncIndicator.textContent = `✅ Synced: Episode ${episode}`;
+        syncIndicator.textContent = `✅ ${data.message}`;
         syncIndicator.className =
           "fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg z-50";
         document.body.appendChild(syncIndicator);
@@ -158,10 +128,10 @@ export default function PlayerPage() {
     console;
   }, [animeId]);
 
-  // Update status to CURRENT when page loads
+  // Update status to CURRENT (watching) when page loads
   useEffect(() => {
     if (anime && accessToken && animeId) {
-      updateAniListStatus();
+      updateAniListProgress(currentEpisode, anime.episodes, "CURRENT");
     }
   }, [anime, accessToken]);
 
@@ -223,7 +193,7 @@ export default function PlayerPage() {
       player.on("ended", () => {
         console.log("🏁 Playback ended");
         if (anime && accessToken) {
-          updateAniListProgress(currentEpisode, anime.episodes);
+          updateAniListProgress(currentEpisode, anime.episodes, "COMPLETED");
         }
       });
 
@@ -235,7 +205,7 @@ export default function PlayerPage() {
         if (currentTime && duration && currentTime / duration >= 0.8) {
           if (anime && accessToken && !syncProgress) {
             setSyncProgress(true);
-            updateAniListProgress(currentEpisode, anime.episodes);
+            updateAniListProgress(currentEpisode, anime.episodes, "COMPLETED");
           }
         }
       });
