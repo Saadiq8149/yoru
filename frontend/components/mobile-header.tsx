@@ -19,7 +19,7 @@ export default function MobileHeader({ onMenuClick }: MobileHeaderProps) {
         <div className="w-6 h-6 rounded-lg flex items-center justify-center">
           <span className="text-primary-foreground font-bold text-sm">夜</span>
         </div>
-        <h1 className="text-lg font-bold">yoru</h1>
+        <h1 className="text-lg font-bold">Yoru</h1>
       </div>
       <div className="w-6" />
     </header>
