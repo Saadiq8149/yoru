@@ -43,6 +43,7 @@ export default function PlayerPage() {
   const playerRef = useRef<any>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [syncProgress, setSyncProgress] = useState(false);
+  const [savedTime, setSavedTime] = useState<number>(0);
 
   // Check for AniList auth
   useEffect(() => {
@@ -51,6 +52,20 @@ export default function PlayerPage() {
       setAccessToken(token);
     }
   }, []);
+
+  // Load saved timestamp from localStorage
+  useEffect(() => {
+    if (!animeId) return;
+
+    const watchKey = `watch_${animeId}_${currentEpisode}`;
+    const savedTimestamp = localStorage.getItem(watchKey);
+
+    if (savedTimestamp) {
+      const time = parseFloat(savedTimestamp);
+      setSavedTime(time);
+      console.log(`📺 Resuming from ${time.toFixed(2)}s`);
+    }
+  }, [animeId, currentEpisode]);
 
   // Sync progress with AniList
   const updateAniListProgress = async (
@@ -149,6 +164,22 @@ export default function PlayerPage() {
     setSyncProgress(false);
   }, [currentEpisode]);
 
+  // Poll and save playback time to localStorage every 30 seconds
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (playerRef.current && animeId) {
+        const currentTime = playerRef.current.currentTime();
+        if (currentTime > 0) {
+          const watchKey = `watch_${animeId}_${currentEpisode}`;
+          localStorage.setItem(watchKey, currentTime.toString());
+          console.log(`💾 Saved progress: ${currentTime.toFixed(2)}s`);
+        }
+      }
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(intervalId);
+  }, [animeId, currentEpisode]);
+
   useLayoutEffect(() => {
     const videoEl = videoRef.current;
     if (!videoEl) return; // video element not yet in DOM
@@ -201,8 +232,18 @@ export default function PlayerPage() {
       console.log("🎥 Updating player source to:", proxyUrl);
       playerRef.current.src({ src: proxyUrl, type: "video/mp4" });
       playerRef.current.load();
+
+      // Seek to saved time once video is ready
+      const seekHandler = () => {
+        if (savedTime > 0) {
+          playerRef.current.currentTime(savedTime);
+          console.log(`⏩ Seeked to ${savedTime.toFixed(2)}s`);
+        }
+      };
+
+      playerRef.current.one("canplay", seekHandler);
     }
-  }, [selectedSource]);
+  }, [selectedSource, savedTime]);
 
   // Keyboard controls
   useEffect(() => {
